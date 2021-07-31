@@ -1,7 +1,5 @@
 package lk.ijse.dep7.sms_lite.controller;
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -40,9 +38,14 @@ public class StudentManagementFormController {
     private TableColumn colPhone;
     @FXML
     private TableColumn<StudentTM, Button> colAction;
+    @FXML
+    private TextField txtSearch;
 
     public void initialize() {
         tableColumnAutoSize();
+
+        // Allow multiple row selection
+        tblStudent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         colID.setCellValueFactory(new PropertyValueFactory<>("studentID"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -50,14 +53,14 @@ public class StudentManagementFormController {
         colAction.setCellValueFactory(param -> {
             ImageView img = new ImageView("/lk/ijse/dep7/sms_lite/asset/image/delete.png");
             img.setFitHeight(20);
-            img.setFitWidth(16);
+            img.setFitWidth(20);
             Button btnRowDelete = new Button();
             btnRowDelete.setPrefWidth(30);
             btnRowDelete.setGraphic(img);
 
             btnRowDelete.setOnAction(
                     (event) -> {
-                        System.out.println(param.getValue());
+                        System.out.println(tblStudent.getItems().remove(param.getValue()));
                     }
             );
             return new ReadOnlyObjectWrapper<>(btnRowDelete);
@@ -65,11 +68,35 @@ public class StudentManagementFormController {
         });
 
         init();
-        
+
         Platform.runLater(() -> {
 
+            // Set listeners
+            tblStudent.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedStudent) -> {
+                txtID.clear();
+                txtName.clear();
+                txtPhone.clear();
+                lstvwPhoneList.getItems().clear();
+
+                if (selectedStudent != null) {
+                    txtID.setDisable(true);
+                    txtID.setText(selectedStudent.getStudentID());
+                    txtName.setText(selectedStudent.getName());
+                    lstvwPhoneList.getItems().addAll(selectedStudent.getPhoneNumbers().split(", "));
+
+                } else {
+                    txtID.setDisable(false);
+                }
+            });
+
+            txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            });
+
+
+            // Add some dummy data
             tblStudent.getItems().add(new StudentTM("SID0001", "Nuwan Kulasekara", new String[]{"077-460 2589"}));
-            tblStudent.getItems().add(new StudentTM("SID0001", "Nuwan Kulasekara", new String[]{"077-460 2589"}));
+            tblStudent.getItems().add(new StudentTM("SID0002", "Bhanuka Rajapaksh", new String[]{"071-258 2589","075-346 7896"}));
         });
     }
 
@@ -91,6 +118,8 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnClear_onAction(ActionEvent actionEvent) {
+      
+
     }
 
     @FXML
