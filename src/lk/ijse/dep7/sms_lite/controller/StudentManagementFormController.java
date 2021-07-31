@@ -1,5 +1,6 @@
 package lk.ijse.dep7.sms_lite.controller;
 
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,6 +36,21 @@ public class StudentManagementFormController {
 
     public void initialize() {
         tableColumnAutoSize();
+
+        Platform.runLater(()->{
+
+        });
+    }
+
+    private void init(){
+        btnClear.setDisable(true);
+        btnSave.setDisable(true);
+        btnDelete.setDisable(true);
+        btnAddPhone.setDisable(true);
+
+        txtID.requestFocus();
+
+        // add some dummy data
     }
 
     @FXML
