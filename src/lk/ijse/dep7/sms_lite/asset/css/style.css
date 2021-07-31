@@ -1,0 +1,12 @@
+*{
+   -fx-font-size:  16;
+}
+
+.text-field, .button, .table-column{
+    -fx-pref-height: 40;
+}
+
+.label{
+    -fx-pref-width: 60;
+    -fx-pref-height: 40;
+}

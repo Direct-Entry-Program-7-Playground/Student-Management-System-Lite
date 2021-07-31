@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="840.0" prefWidth="960.0" stylesheets="@../asset/css/style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.dep7.sms_lite.controller.StudentManagementFormController">
+   <children>
+      <VBox layoutX="14.0" layoutY="51.0" prefHeight="840.0" prefWidth="960.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <VBox spacing="10.0">
+               <children>
+                  <HBox spacing="20.0">
+                     <children>
+                        <Label text="ID" />
+                        <TextField fx:id="txtID" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="20.0">
+                     <children>
+                        <Label text="Name" />
+                        <TextField fx:id="txtName" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="20.0">
+                     <children>
+                        <Label text="Phone" />
+                        <VBox spacing="10.0">
+                           <children>
+                              <TextField fx:id="txtPhone" />
+                              <ListView fx:id="lstvwPhoneList" prefHeight="150.0" prefWidth="200.0" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="btnAddPhone" mnemonicParsing="false" onAction="#btnAddPhone_onAction" text="Add Phone Number" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox maxHeight="1.7976931348623157E308" spacing="20.0">
+               <children>
+                  <Button fx:id="btnClear" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnClear_onAction" text="Clear" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnSave" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnSave_onAction" text="Save" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnDelete" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnDelete_onAction" text="Delete" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <TableView prefHeight="200.0" prefWidth="887.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="colID" prefWidth="208.0" text="ID" />
+                <TableColumn fx:id="colName" prefWidth="178.0" text="Name" />
+                  <TableColumn fx:id="colPhone" prefWidth="178.0" text="Phone " />
+                  <TableColumn fx:id="colOption" prefWidth="178.0" text="Option" />
+              </columns>
+            </TableView>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
