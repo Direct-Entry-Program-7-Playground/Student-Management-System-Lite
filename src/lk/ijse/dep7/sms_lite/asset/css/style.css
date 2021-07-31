@@ -17,3 +17,7 @@
 #colAction{
     -fx-alignment: CENTER;
 }
+#lblSearchStudent{
+    -fx-pref-width: 140;
+
+}
