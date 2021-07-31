@@ -21,13 +21,13 @@
                   <HBox spacing="20.0">
                      <children>
                         <Label text="ID" />
-                        <TextField fx:id="txtID" />
+                        <TextField fx:id="txtID" promptText="eg: SID0001" />
                      </children>
                   </HBox>
                   <HBox spacing="20.0">
                      <children>
                         <Label text="Name" />
-                        <TextField fx:id="txtName" HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="txtName" promptText="eg: Joen Doe" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                   <HBox spacing="20.0">
@@ -35,7 +35,7 @@
                         <Label text="Phone" />
                         <VBox spacing="10.0">
                            <children>
-                              <TextField fx:id="txtPhone" />
+                              <TextField fx:id="txtPhone" promptText="eg: 077-123 4567" />
                               <ListView fx:id="lstvwPhoneList" prefHeight="150.0" prefWidth="200.0" />
                            </children>
                         </VBox>
