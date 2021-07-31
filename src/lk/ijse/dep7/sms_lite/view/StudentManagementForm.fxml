@@ -52,12 +52,12 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <TableView prefHeight="200.0" prefWidth="887.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblStudent" prefHeight="200.0" prefWidth="887.0" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn fx:id="colID" prefWidth="208.0" text="ID" />
-                <TableColumn fx:id="colName" prefWidth="178.0" text="Name" />
-                  <TableColumn fx:id="colPhone" prefWidth="178.0" text="Phone " />
-                  <TableColumn fx:id="colOption" prefWidth="178.0" text="Option" />
+                <TableColumn fx:id="colID" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="ID" />
+                <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="365.0" prefWidth="365.0" text="Name" />
+                  <TableColumn fx:id="colPhone" maxWidth="600.0" minWidth="300.0" prefWidth="300.0" text="Phone " />
+                  <TableColumn fx:id="colOption" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Option" />
               </columns>
             </TableView>
          </children>
