@@ -80,12 +80,21 @@ public class StudentManagementFormController {
 
                 if (selectedStudent != null) {
                     txtID.setDisable(true);
+                    btnClear.setDisable(false);
+                    btnSave.setDisable(false);
+                    btnSave.setText("Update");
+                    btnDelete.setDisable(false);
+
                     txtID.setText(selectedStudent.getStudentID());
                     txtName.setText(selectedStudent.getName());
                     lstvwPhoneList.getItems().addAll(selectedStudent.getPhoneNumbers().split(", "));
 
                 } else {
                     txtID.setDisable(false);
+                    btnClear.setDisable(true);
+                    btnSave.setDisable(true);
+                    btnSave.setText("Save");
+                    btnDelete.setDisable(true);
                 }
             });
 
@@ -118,9 +127,17 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnClear_onAction(ActionEvent actionEvent) {
-      
+        txtID.clear();
+        txtName.clear();
+        txtPhone.clear();
+        txtSearch.clear();
+        lstvwPhoneList.getItems().clear();
+        tblStudent.getSelectionModel().clearSelection();
 
+        txtID.requestFocus();
     }
+
+    
 
     @FXML
     private void btnSave_onAction(ActionEvent actionEvent) {
