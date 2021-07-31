@@ -1,11 +1,9 @@
 package lk.ijse.dep7.sms_lite.controller;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 public class StudentManagementFormController {
     @FXML
@@ -32,6 +30,12 @@ public class StudentManagementFormController {
     private TableColumn colPhone;
     @FXML
     private TableColumn colOption;
+    @FXML
+    private TableView tblStudent;
+
+    public void initialize() {
+        tableColumnAutoSize();
+    }
 
     @FXML
     private void btnAddPhone_onAction(ActionEvent actionEvent) {
@@ -47,5 +51,15 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnDelete_onAction(ActionEvent actionEvent) {
+    }
+
+    private void tableColumnAutoSize() {
+        double tableWidth = colID.widthProperty().get();
+        tableWidth += colOption.widthProperty().get();
+        tableWidth += colPhone.widthProperty().get();
+
+        DoubleBinding autoWidth = tblStudent.widthProperty().subtract(tableWidth);
+        colName.prefWidthProperty().bind(autoWidth);
+        System.out.println(tableWidth);
     }
 }
