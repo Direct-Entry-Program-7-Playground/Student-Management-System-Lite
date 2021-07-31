@@ -52,6 +52,12 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
+            <HBox spacing="20.0">
+               <children>
+                  <Label fx:id="lblSearchStudent" text="Search Students" />
+                  <TextField fx:id="txtSearch" promptText="Search Students by ID, Name, Phone Numbers" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
             <TableView fx:id="tblStudent" prefHeight="200.0" prefWidth="887.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="colID" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="ID" />
