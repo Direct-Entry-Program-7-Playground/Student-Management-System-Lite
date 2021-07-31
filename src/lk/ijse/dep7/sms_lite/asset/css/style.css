@@ -6,7 +6,14 @@
     -fx-pref-height: 40;
 }
 
+.table-column{
+    -fx-alignment: CENTER;
+}
 .label{
     -fx-pref-width: 60;
     -fx-pref-height: 40;
+}
+
+#colAction{
+    -fx-alignment: CENTER;
 }
