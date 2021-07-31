@@ -55,9 +55,9 @@
             <TableView fx:id="tblStudent" prefHeight="200.0" prefWidth="887.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="colID" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="ID" />
-                <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="365.0" prefWidth="365.0" text="Name" />
+                <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="363.0" prefWidth="363.0" text="Name" />
                   <TableColumn fx:id="colPhone" maxWidth="600.0" minWidth="300.0" prefWidth="300.0" text="Phone " />
-                  <TableColumn fx:id="colOption" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Option" />
+                  <TableColumn fx:id="colAction" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Action" />
               </columns>
             </TableView>
          </children>
