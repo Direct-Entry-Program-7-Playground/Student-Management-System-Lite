@@ -2,7 +2,7 @@ package lk.ijse.dep7.sms_lite.controller;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,8 +13,8 @@ import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
 
 
 public class StudentManagementFormController {
-    boolean idAndNameValid = false;
-    boolean hasPhoneNumber = false;
+    BooleanProperty idAndNameValid = new SimpleBooleanProperty(false);
+    BooleanProperty hasPhoneNumber = new SimpleBooleanProperty(false);
     @FXML
     private TextField txtID;
     @FXML
@@ -88,7 +88,6 @@ public class StudentManagementFormController {
 
                 if (selectedStudent != null) {
                     txtID.setDisable(true);
-                    // btnClear.setDisable(false);
                     btnSave.setDisable(false);
                     btnSave.setText("Update");
                     btnDelete.setDisable(false);
@@ -96,32 +95,36 @@ public class StudentManagementFormController {
                     txtID.setText(selectedStudent.getStudentID());
                     txtName.setText(selectedStudent.getName());
                     lstvwPhoneList.getItems().addAll(selectedStudent.getPhoneNumbers().split(", "));
-
+                    btnClearPhoneList.setDisable(false);
                 } else {
                     txtID.setDisable(false);
-                    //  btnClear.setDisable(true);
                     btnSave.setDisable(true);
                     btnSave.setText("Save");
                     btnDelete.setDisable(true);
+                    btnClearPhoneList.setDisable(true);
+
                 }
             });
 
             ChangeListener listener = (ChangeListener<String>) (observable, oldValue, newValue) -> {
 
-                String id = txtID.getText();
-                String name = txtName.getText();
+                if (btnSave.getText().equals("Save")) {
+                    String id = txtID.getText();
+                    String name = txtName.getText();
 
-                if (id.matches("SID\\d{4}") && name.matches("[A-Za-z ]{3,}")) {
-                    idAndNameValid = true;
-                } else {
-                    idAndNameValid = false;
+                    if (id.matches("SID\\d{4}") && name.matches("[A-Za-z ]{3,}")) {
+                        idAndNameValid.setValue(true);
+                    } else {
+                        idAndNameValid.setValue(false);
+                    }
+
+                    if (idAndNameValid.get() && hasPhoneNumber.get()) {
+                        btnSave.setDisable(false);
+                    } else {
+                        btnSave.setDisable(true);
+                    }
                 }
 
-                if (idAndNameValid && hasPhoneNumber) {
-                    btnSave.setDisable(false);
-                } else {
-                    btnSave.setDisable(true);
-                }
             };
 
             txtID.textProperty().addListener(listener);
@@ -136,24 +139,20 @@ public class StudentManagementFormController {
                 }
             });
 
-                    /*.addListener((observable, oldValue, newValue) -> {
-                        System.out.println(observable);
-                        hasPhoneNumber = true;
-
-                    });*/
-
-              /*      .addListener((observable, oldValue, newValue) -> {
-                if (newValue != null) {
-                    hasPhoneNumber = true;
+            idAndNameValid.addListener((observable, oldValue, newValue) -> {
+                if (idAndNameValid.get() && hasPhoneNumber.get()) {
+                    btnSave.setDisable(false);
                 } else {
-                    hasPhoneNumber = false;
-                }*/
-
-            if (idAndNameValid && hasPhoneNumber) {
-                btnSave.setDisable(false);
-            } else {
-                btnSave.setDisable(true);
-            }
+                    btnSave.setDisable(true);
+                }
+            });
+            hasPhoneNumber.addListener((observable, oldValue, newValue) -> {
+                if (idAndNameValid.get() && hasPhoneNumber.get()) {
+                    btnSave.setDisable(false);
+                } else {
+                    btnSave.setDisable(true);
+                }
+            });
 
 
             txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -175,7 +174,6 @@ public class StudentManagementFormController {
     }
 
     private void init() {
-        //  btnClear.setDisable(true);
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
 
@@ -184,9 +182,6 @@ public class StudentManagementFormController {
         btnDeletePhoneNumber.setDisable(true);
 
         txtID.requestFocus();
-
-        // add some dummy data
-
     }
 
     @FXML
@@ -198,7 +193,7 @@ public class StudentManagementFormController {
         txtPhone.requestFocus();
 
         btnClearPhoneList.setDisable(false);
-
+        hasPhoneNumber.setValue(true);
     }
 
 
@@ -207,12 +202,20 @@ public class StudentManagementFormController {
         lstvwPhoneList.getItems().removeAll(lstvwPhoneList.getSelectionModel().getSelectedItems());
         txtPhone.requestFocus();
 
+        if (lstvwPhoneList.getItems().size() == 0) {
+            hasPhoneNumber.setValue(false);
+            btnClearPhoneList.setDisable(true);
+        }
     }
 
     @FXML
     private void btnClearPhoneList_onAction(ActionEvent event) {
         lstvwPhoneList.getItems().clear();
         txtPhone.requestFocus();
+
+        hasPhoneNumber.setValue(false);
+        btnDeletePhoneNumber.setDisable(true);
+        btnClearPhoneList.setDisable(true);
 
     }
 
