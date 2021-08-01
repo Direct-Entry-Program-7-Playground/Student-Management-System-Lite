@@ -127,8 +127,13 @@ public class StudentManagementFormController {
             txtID.textProperty().addListener(listener);
             txtName.textProperty().addListener(listener);
 
-            lstvwPhoneList.itemsProperty().addListener(changeListener -> {
-                System.out.println(changeListener);
+            lstvwPhoneList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedItem) -> {
+                if (selectedItem != null) {
+                    btnDeletePhoneNumber.setDisable(false);
+
+                } else {
+                    btnDeletePhoneNumber.setDisable(true);
+                }
             });
 
                     /*.addListener((observable, oldValue, newValue) -> {
@@ -193,7 +198,6 @@ public class StudentManagementFormController {
         txtPhone.requestFocus();
 
         btnClearPhoneList.setDisable(false);
-        btnDeletePhoneNumber.setDisable(false);
 
     }
 
@@ -202,7 +206,7 @@ public class StudentManagementFormController {
     private void btnDeletePhoneNumber_onAction(ActionEvent event) {
         lstvwPhoneList.getItems().removeAll(lstvwPhoneList.getSelectionModel().getSelectedItems());
         txtPhone.requestFocus();
-        
+
     }
 
     @FXML
