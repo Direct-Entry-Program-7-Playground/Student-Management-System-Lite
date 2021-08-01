@@ -39,7 +39,13 @@
                               <ListView fx:id="lstvwPhoneList" prefHeight="150.0" prefWidth="200.0" />
                            </children>
                         </VBox>
-                        <Button fx:id="btnAddPhone" mnemonicParsing="false" onAction="#btnAddPhone_onAction" text="Add Phone Number" />
+                        <VBox spacing="10.0">
+                           <children>
+                              <Button fx:id="btnAddPhone" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAddPhone_onAction" text="Add Phone Number" VBox.vgrow="ALWAYS" />
+                              <Button fx:id="btnDeletePhoneNumber" mnemonicParsing="false" onAction="#btnDeletePhoneNumber_onAction" text="Delete Phone Number" />
+                              <Button fx:id="btnClearPhoneList" mnemonicParsing="false" onAction="#btnClearPhoneList_onAction" text="Clear Phone Numbers" />
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
                </children>
