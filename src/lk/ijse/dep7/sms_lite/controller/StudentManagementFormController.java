@@ -22,7 +22,7 @@ public class StudentManagementFormController {
     BooleanProperty idAndNameValid = new SimpleBooleanProperty(false);
     BooleanProperty hasPhoneNumber = new SimpleBooleanProperty(false);
     Connection connection;
-    PreparedStatement FIND_STUDENT_CONTACT_QUERY;
+    PreparedStatement FIND_STUDENT_QUERY;
     @FXML
     private TextField txtID;
     @FXML
@@ -87,11 +87,23 @@ public class StudentManagementFormController {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SMSLite", "root", "7251mMm7251");
 
             // Define prepareStatements
-            FIND_STUDENT_CONTACT_QUERY = connection.prepareStatement("SELECT * FROM contact WHERE student_id = ?;");
+            FIND_STUDENT_QUERY = connection.prepareStatement("SELECT * FROM student INNER JOIN contact ON student.id = contact.student_id WHERE student_id = ?;");
 
         } catch (SQLException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to connect with the database").showAndWait();
             e.printStackTrace();
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }));
+
 
         init();
 
@@ -114,6 +126,8 @@ public class StudentManagementFormController {
                     txtName.setText(selectedStudent.getName());
                     lstvwPhoneList.getItems().addAll(selectedStudent.getPhoneNumbers().split(", "));
                     btnClearPhoneList.setDisable(false);
+
+                    txtName.requestFocus();
                 } else {
                     txtID.setDisable(false);
                     btnSave.setDisable(true);
@@ -150,9 +164,13 @@ public class StudentManagementFormController {
 
             lstvwPhoneList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, selectedItem) -> {
                 if (selectedItem != null) {
+                    txtPhone.setText(selectedItem.toString());
+                    txtPhone.requestFocus();
+                    btnAddPhone.setText("Update Phone Number");
                     btnDeletePhoneNumber.setDisable(false);
-
                 } else {
+                    txtPhone.clear();
+                    btnAddPhone.setText("Add Phone Number");
                     btnDeletePhoneNumber.setDisable(true);
                 }
             });
@@ -174,25 +192,25 @@ public class StudentManagementFormController {
 
 
             txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-
+                tblStudent.getItems().clear();
                 String query = txtSearch.getText();
 
 
                 try {
-                    PreparedStatement SEARCH_STUDENT_TABLE_QUERY = connection.prepareStatement("SELECT * FROM student WHERE id LIKE CONCAT('%',?,'%') OR name LIKE CONCAT('%',?,'%');");
-                    SEARCH_STUDENT_TABLE_QUERY.setString(1,query);
-                    SEARCH_STUDENT_TABLE_QUERY.setString(2,query);
-                    ResultSet studentsSet = SEARCH_STUDENT_TABLE_QUERY.executeQuery();
+                    PreparedStatement SEARCH_STUDENT_TABLE_QUERY = connection.prepareStatement("SELECT * FROM student  WHERE id LIKE CONCAT('%',?,'%') OR name LIKE CONCAT('%',?,'%') ;");
+                    SEARCH_STUDENT_TABLE_QUERY.setString(1, query);
+                    SEARCH_STUDENT_TABLE_QUERY.setString(2, query);
+                    ResultSet resultSet = SEARCH_STUDENT_TABLE_QUERY.executeQuery();
+                    addStudentsToTableView(resultSet);
 
+                    // todo
                     PreparedStatement SEARCH_CONTACT_TABLE_QUERY = connection.prepareStatement("SELECT * FROM contact WHERE contact LIKE CONCAT('%',?,'%');");
-                    SEARCH_CONTACT_TABLE_QUERY.setString(1,query);
+                    SEARCH_CONTACT_TABLE_QUERY.setString(1, query);
                     ResultSet contactsSet = SEARCH_CONTACT_TABLE_QUERY.executeQuery();
 
-                    addStudentsToTableView(studentsSet);
 
-
-                } catch (SQLException E) {
-                    E.printStackTrace();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             });
 
@@ -227,8 +245,8 @@ public class StudentManagementFormController {
             String id = rst.getString("id");
             String name = rst.getString("name");
 
-            FIND_STUDENT_CONTACT_QUERY.setString(1, id);
-            ResultSet contactSet = FIND_STUDENT_CONTACT_QUERY.executeQuery();
+            FIND_STUDENT_QUERY.setString(1, id);
+            ResultSet contactSet = FIND_STUDENT_QUERY.executeQuery();
 
             List<String> contacts = new ArrayList<>();
             while (contactSet.next()) {
@@ -253,12 +271,17 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnAddPhone_onAction(ActionEvent actionEvent) {
-
         String phoneNumber = txtPhone.getText();
-        lstvwPhoneList.getItems().add(phoneNumber);
+
+        if (btnAddPhone.getText().equals("Add Phone Number")) {
+            lstvwPhoneList.getItems().add(phoneNumber);
+
+        } else {
+            int selectedItemIndex = lstvwPhoneList.getSelectionModel().getSelectedIndex();
+            lstvwPhoneList.getItems().set(selectedItemIndex, phoneNumber);
+        }
         txtPhone.clear();
         txtPhone.requestFocus();
-
         btnClearPhoneList.setDisable(false);
         hasPhoneNumber.setValue(true);
     }
@@ -273,6 +296,8 @@ public class StudentManagementFormController {
             hasPhoneNumber.setValue(false);
             btnClearPhoneList.setDisable(true);
         }
+
+        lstvwPhoneList.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -307,13 +332,96 @@ public class StudentManagementFormController {
         if (btnSave.getText().equals("Save")) {
 
         } else {
+            StudentTM selectedStudent = tblStudent.getSelectionModel().getSelectedItem();
+            int contactCount = selectedStudent.getPhoneNumbers().split(", ").length;
+            String id = selectedStudent.getStudentID();
+            String name = txtName.getText().trim();
+            List<String> contacts = lstvwPhoneList.getItems();
+
+            try {
+                // update student
+                PreparedStatement UPDATE_STUDENT_QUERY = connection.prepareStatement("UPDATE student SET name = ? WHERE id = ?;");
+                UPDATE_STUDENT_QUERY.setString(1, name);
+                UPDATE_STUDENT_QUERY.setString(2, id);
+                int affectedStudentRows = UPDATE_STUDENT_QUERY.executeUpdate();
+
+                // update student's contact
+                int deletedContactRows = connection.createStatement().executeUpdate("DELETE FROM contact WHERE student_id = 'id';");
+
+                PreparedStatement INSERT_CONTACT_QUERY = connection.prepareStatement("INSERT INTO contact VALUES(?,?);");
+                int contactsCount = contacts.size();
+                int affectedContactRows = 0;
+                for (String contact :
+                        contacts) {
+                    INSERT_CONTACT_QUERY.setString(1, contact);
+                    INSERT_CONTACT_QUERY.setString(2, id);
+                    affectedContactRows += INSERT_CONTACT_QUERY.executeUpdate();
+                }
+
+                if ((affectedStudentRows == 1) && (contactCount == deletedContactRows) && (contactsCount == affectedContactRows)) {
+                    tblStudent.getItems().add(new StudentTM(id, name, contacts.toArray(new String[0])));
+
+                } else {
+                    new Alert(Alert.AlertType.ERROR, "Failed to save the student and contacts, try again").show();
+                }
+                txtID.clear();
+                txtName.clear();
+                txtPhone.clear();
+                lstvwPhoneList.getItems().clear();
+                txtID.requestFocus();
+                tblStudent.refresh();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
         }
     }
 
     @FXML
     private void btnDelete_onAction(ActionEvent actionEvent) {
+        List<StudentTM> selectedItems = tblStudent.getSelectionModel().getSelectedItems();
+        int selectedStudentsCount = selectedItems.size();
+        int selectedStudentContactsCount = 0;
+        int affectedStudentRows = 0;
+        int affectedContactRows = 0;
+        for (StudentTM student :
+                selectedItems) {
+            selectedStudentContactsCount = student.getPhoneNumbers().split(", ").length;
+
+            try {
+                PreparedStatement DELETE_STUDENT_QUERY = connection.prepareStatement("DELETE FROM student WHERE id = ?;");
+                DELETE_STUDENT_QUERY.setString(1, student.getStudentID());
+                affectedStudentRows = DELETE_STUDENT_QUERY.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                PreparedStatement DELETE_CONTACT_QUERY = connection.prepareStatement("DELETE FROM contact WHERE student_id = ?;");
+                DELETE_CONTACT_QUERY.setString(1, student.getStudentID());
+                affectedContactRows = DELETE_CONTACT_QUERY.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            if (!(affectedStudentRows == selectedStudentsCount) && !(affectedContactRows == selectedStudentContactsCount)) {
+                txtID.clear();
+                txtName.clear();
+                txtPhone.clear();
+                lstvwPhoneList.getItems().clear();
+                txtID.requestFocus();
+                tblStudent.refresh();
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Failed to save the student and contacts, try again").show();
+            }
+
+
+        }
         tblStudent.getItems().removeAll(tblStudent.getSelectionModel().getSelectedItems());
+
+
+        tblStudent.getSelectionModel().clearSelection();
 
     }
 
