@@ -71,11 +71,14 @@ public class StudentManagementFormController {
             img.setFitHeight(20);
             img.setFitWidth(20);
             Button btnRowDelete = new Button();
+            btnRowDelete.setId("rowDelete");
             btnRowDelete.setPrefWidth(30);
             btnRowDelete.setGraphic(img);
 
             btnRowDelete.setOnAction(
                     (event) -> {
+                        // todo : Remove the row from database
+                        deleteStudent(event, param.getValue());
                         tblStudent.getItems().remove(param.getValue());
                     }
             );
@@ -124,8 +127,11 @@ public class StudentManagementFormController {
 
                     txtID.setText(selectedStudent.getStudentID());
                     txtName.setText(selectedStudent.getName());
-                    lstvwPhoneList.getItems().addAll(selectedStudent.getPhoneNumbers().split(", "));
-                    btnClearPhoneList.setDisable(false);
+
+                    String[] phoneNumbers = selectedStudent.getPhoneNumbers().split(", ");
+
+                    lstvwPhoneList.getItems().addAll(phoneNumbers);
+                    btnClearPhoneList.setDisable(phoneNumbers.length != 0);
 
                     txtName.requestFocus();
                 } else {
@@ -141,19 +147,13 @@ public class StudentManagementFormController {
             ChangeListener listener = (ChangeListener<String>) (observable, oldValue, newValue) -> {
 
                 if (btnSave.getText().equals("Save")) {
-                    String id = txtID.getText();
-                    String name = txtName.getText();
+                    String id = txtID.getText().trim();
+                    String name = txtName.getText().trim();
 
                     if (id.matches("SID\\d{4}") && name.matches("[A-Za-z ]{3,}")) {
                         idAndNameValid.setValue(true);
                     } else {
                         idAndNameValid.setValue(false);
-                    }
-
-                    if (idAndNameValid.get() && hasPhoneNumber.get()) {
-                        btnSave.setDisable(false);
-                    } else {
-                        btnSave.setDisable(true);
                     }
                 }
 
@@ -182,6 +182,7 @@ public class StudentManagementFormController {
                     btnSave.setDisable(true);
                 }
             });
+
             hasPhoneNumber.addListener((observable, oldValue, newValue) -> {
                 if (idAndNameValid.get() && hasPhoneNumber.get()) {
                     btnSave.setDisable(false);
@@ -191,6 +192,7 @@ public class StudentManagementFormController {
             });
 
 
+            // todo: search with phone
             txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
                 tblStudent.getItems().clear();
                 String query = txtSearch.getText();
@@ -238,25 +240,6 @@ public class StudentManagementFormController {
         });
     }
 
-    private void addStudentsToTableView(ResultSet rst) throws SQLException {
-        tblStudent.getItems().clear();
-
-        while (rst.next()) {
-            String id = rst.getString("id");
-            String name = rst.getString("name");
-
-            FIND_STUDENT_QUERY.setString(1, id);
-            ResultSet contactSet = FIND_STUDENT_QUERY.executeQuery();
-
-            List<String> contacts = new ArrayList<>();
-            while (contactSet.next()) {
-                contacts.add(contactSet.getString("contact"));
-            }
-
-            tblStudent.getItems().add(new StudentTM(id, name, contacts.toArray(new String[0])));
-        }
-    }
-
     private void init() {
         btnSave.setDisable(true);
         btnDelete.setDisable(true);
@@ -268,6 +251,26 @@ public class StudentManagementFormController {
         txtID.requestFocus();
 
     }
+
+    private void addStudentsToTableView(ResultSet rst) throws SQLException {
+        tblStudent.getItems().clear();
+
+        while (rst.next()) {
+            String id = rst.getString("id");
+            String name = rst.getString("name");
+
+            FIND_STUDENT_QUERY.setString(1, id);
+            ResultSet studentSet = FIND_STUDENT_QUERY.executeQuery();
+
+            List<String> contacts = new ArrayList<>();
+            while (studentSet.next()) {
+                contacts.add(studentSet.getString("contact"));
+            }
+
+            tblStudent.getItems().add(new StudentTM(id, name, contacts.toArray(new String[0])));
+        }
+    }
+
 
     @FXML
     private void btnAddPhone_onAction(ActionEvent actionEvent) {
@@ -281,9 +284,10 @@ public class StudentManagementFormController {
             lstvwPhoneList.getItems().set(selectedItemIndex, phoneNumber);
         }
         txtPhone.clear();
-        txtPhone.requestFocus();
         btnClearPhoneList.setDisable(false);
         hasPhoneNumber.setValue(true);
+        lstvwPhoneList.getSelectionModel().clearSelection();
+        txtPhone.requestFocus();
     }
 
 
@@ -303,11 +307,11 @@ public class StudentManagementFormController {
     @FXML
     private void btnClearPhoneList_onAction(ActionEvent event) {
         lstvwPhoneList.getItems().clear();
-        txtPhone.requestFocus();
 
         hasPhoneNumber.setValue(false);
         btnDeletePhoneNumber.setDisable(true);
         btnClearPhoneList.setDisable(true);
+        txtPhone.requestFocus();
 
     }
 
@@ -333,33 +337,45 @@ public class StudentManagementFormController {
 
         } else {
             StudentTM selectedStudent = tblStudent.getSelectionModel().getSelectedItem();
-            int contactCount = selectedStudent.getPhoneNumbers().split(", ").length;
+
+            int oldContactCount = selectedStudent.getPhoneNumbers().split(", ").length;
             String id = selectedStudent.getStudentID();
             String name = txtName.getText().trim();
+
             List<String> contacts = lstvwPhoneList.getItems();
+            int newContactsCount = contacts.size();
 
             try {
+                // update student's contact
+                PreparedStatement DELETE_CONTACT_QUERY = connection.prepareStatement("DELETE FROM contact WHERE student_id = ?;");
+                DELETE_CONTACT_QUERY.setString(1, id);
+                int deletedContactRows = DELETE_CONTACT_QUERY.executeUpdate();
+
+
+                PreparedStatement INSERT_CONTACT_QUERY = connection.prepareStatement("INSERT INTO contact VALUES(?,?);");
+                int addedContactRows = 0;
+                for (String contact :
+                        contacts) {
+                    INSERT_CONTACT_QUERY.setString(1, contact);
+                    INSERT_CONTACT_QUERY.setString(2, id);
+                    addedContactRows += INSERT_CONTACT_QUERY.executeUpdate();
+                }
+
+
                 // update student
                 PreparedStatement UPDATE_STUDENT_QUERY = connection.prepareStatement("UPDATE student SET name = ? WHERE id = ?;");
                 UPDATE_STUDENT_QUERY.setString(1, name);
                 UPDATE_STUDENT_QUERY.setString(2, id);
                 int affectedStudentRows = UPDATE_STUDENT_QUERY.executeUpdate();
 
-                // update student's contact
-                int deletedContactRows = connection.createStatement().executeUpdate("DELETE FROM contact WHERE student_id = 'id';");
 
-                PreparedStatement INSERT_CONTACT_QUERY = connection.prepareStatement("INSERT INTO contact VALUES(?,?);");
-                int contactsCount = contacts.size();
-                int affectedContactRows = 0;
-                for (String contact :
-                        contacts) {
-                    INSERT_CONTACT_QUERY.setString(1, contact);
-                    INSERT_CONTACT_QUERY.setString(2, id);
-                    affectedContactRows += INSERT_CONTACT_QUERY.executeUpdate();
-                }
+                if ((affectedStudentRows == 1) && (oldContactCount == deletedContactRows) && (newContactsCount == addedContactRows)) {
 
-                if ((affectedStudentRows == 1) && (contactCount == deletedContactRows) && (contactsCount == affectedContactRows)) {
+                    tblStudent.getItems().remove(selectedStudent);
                     tblStudent.getItems().add(new StudentTM(id, name, contacts.toArray(new String[0])));
+                    tblStudent.refresh();
+                    tblStudent.getSortOrder().add(colID);
+                    tblStudent.getSelectionModel().clearSelection();
 
                 } else {
                     new Alert(Alert.AlertType.ERROR, "Failed to save the student and contacts, try again").show();
@@ -369,7 +385,6 @@ public class StudentManagementFormController {
                 txtPhone.clear();
                 lstvwPhoneList.getItems().clear();
                 txtID.requestFocus();
-                tblStudent.refresh();
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -380,7 +395,19 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnDelete_onAction(ActionEvent actionEvent) {
-        List<StudentTM> selectedItems = tblStudent.getSelectionModel().getSelectedItems();
+        deleteStudent(actionEvent, null);
+
+    }
+
+    private void deleteStudent(ActionEvent actionEvent, StudentTM studentTM) {
+        Button source = (Button) actionEvent.getSource();
+        List<StudentTM> selectedItems;
+        if (source.getId().equals("btnDelete")) {
+            selectedItems = tblStudent.getSelectionModel().getSelectedItems();
+        } else {
+            selectedItems = new ArrayList<>();
+            selectedItems.add(studentTM);
+        }
         int selectedStudentsCount = selectedItems.size();
         int selectedStudentContactsCount = 0;
         int affectedStudentRows = 0;
@@ -390,14 +417,6 @@ public class StudentManagementFormController {
             selectedStudentContactsCount = student.getPhoneNumbers().split(", ").length;
 
             try {
-                PreparedStatement DELETE_STUDENT_QUERY = connection.prepareStatement("DELETE FROM student WHERE id = ?;");
-                DELETE_STUDENT_QUERY.setString(1, student.getStudentID());
-                affectedStudentRows = DELETE_STUDENT_QUERY.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            try {
                 PreparedStatement DELETE_CONTACT_QUERY = connection.prepareStatement("DELETE FROM contact WHERE student_id = ?;");
                 DELETE_CONTACT_QUERY.setString(1, student.getStudentID());
                 affectedContactRows = DELETE_CONTACT_QUERY.executeUpdate();
@@ -405,24 +424,30 @@ public class StudentManagementFormController {
                 e.printStackTrace();
             }
 
-            if (!(affectedStudentRows == selectedStudentsCount) && !(affectedContactRows == selectedStudentContactsCount)) {
+            try {
+                PreparedStatement DELETE_STUDENT_QUERY = connection.prepareStatement("DELETE FROM student WHERE id = ?;");
+                DELETE_STUDENT_QUERY.setString(1, student.getStudentID());
+                affectedStudentRows = DELETE_STUDENT_QUERY.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+
+            if ((affectedStudentRows == selectedStudentsCount) && (affectedContactRows == selectedStudentContactsCount)) {
                 txtID.clear();
                 txtName.clear();
                 txtPhone.clear();
                 lstvwPhoneList.getItems().clear();
                 txtID.requestFocus();
+                tblStudent.getItems().removeAll(tblStudent.getSelectionModel().getSelectedItems());
                 tblStudent.refresh();
+                tblStudent.getSelectionModel().clearSelection();
             } else {
-                new Alert(Alert.AlertType.ERROR, "Failed to save the student and contacts, try again").show();
+                new Alert(Alert.AlertType.ERROR, "Failed to delete the student and contacts, try again").show();
             }
 
 
         }
-        tblStudent.getItems().removeAll(tblStudent.getSelectionModel().getSelectedItems());
-
-
-        tblStudent.getSelectionModel().clearSelection();
-
     }
 
     private void tableColumnAutoSize() {
