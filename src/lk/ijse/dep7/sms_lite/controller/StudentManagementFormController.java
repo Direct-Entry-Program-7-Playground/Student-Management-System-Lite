@@ -13,11 +13,16 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
 
+import java.io.IOException;
 import java.sql.*;
 
 
@@ -172,6 +177,17 @@ public class StudentManagementFormController {
 
 
     @FXML
-    private void btnHome_onAction(ActionEvent event) {
+    private void btnHome_onAction(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(this.getClass().getResource("../view/MainForm.fxml"));
+        Scene scene = new Scene(root);
+
+        Stage stage = (Stage) btnHome.getScene().getWindow();
+
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.setTitle("Student Management System - Lite");
+        stage.setResizable(false);
+        stage.show();
+        stage.centerOnScreen();
     }
 }
