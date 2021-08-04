@@ -58,6 +58,8 @@ public class StudentManagementFormController {
     private Button btnDeletePhoneNumber;
     @FXML
     private Button btnClearPhoneList;
+    @FXML
+    private Button btnHome;
 
     public void initialize() {
         tableColumnAutoSize();
@@ -169,4 +171,7 @@ public class StudentManagementFormController {
     }
 
 
+    @FXML
+    private void btnHome_onAction(ActionEvent event) {
+    }
 }

@@ -29,6 +29,11 @@
                      <children>
                         <Label styleClass="label-md" text="Student ID" />
                         <TextField fx:id="txtID" disable="true" promptText="eg: 1" />
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Button fx:id="btnHome" contentDisplay="CENTER" mnemonicParsing="false" onAction="#btnHome_onAction" styleClass="btn-controller" textAlignment="CENTER" />
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
                   <HBox spacing="20.0">
