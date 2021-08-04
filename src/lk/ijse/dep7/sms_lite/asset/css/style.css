@@ -5,26 +5,42 @@
  *
  */
 
-*{
-   -fx-font-size:  16;
+* {
+    -fx-font-size: 16;
 }
 
-.text-field, .button, .table-column{
+.text-field, .button, .table-column {
     -fx-pref-height: 40;
 }
 
-.table-column{
+.table-column {
     -fx-alignment: CENTER;
 }
-.label{
+
+.label {
     -fx-pref-width: 60;
     -fx-pref-height: 40;
 }
 
-#colAction{
+#colAction {
     -fx-alignment: CENTER;
 }
-.label-md{
-    -fx-pref-width: 140;
 
+.label-md {
+    -fx-pref-width: 140;
+}
+
+.btn-lg {
+    -fx-pref-width: 560;
+    -fx-pref-height: 60;
+    -fx-font-weight: bold;
+}
+
+.btn-controller {
+    -fx-pref-height: 40;
+    -fx-pref-width: 40;
+    -fx-background-image: url("../image/home.png");
+    -fx-background-size: 25;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
 }
