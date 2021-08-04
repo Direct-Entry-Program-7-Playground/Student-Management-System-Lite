@@ -21,8 +21,7 @@ public class AppInitializer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-
-        Parent root = FXMLLoader.load(this.getClass().getResource("lk/ijse/dep7/sms_lite/view/StudentManagementForm.fxml"));
+        Parent root = FXMLLoader.load(this.getClass().getResource("lk/ijse/dep7/sms_lite/view/MainForm.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Student Management System - Lite");
