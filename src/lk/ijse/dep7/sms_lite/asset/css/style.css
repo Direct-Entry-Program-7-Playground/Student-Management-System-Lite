@@ -24,7 +24,7 @@
 #colAction{
     -fx-alignment: CENTER;
 }
-#lblSearchStudent{
+.lable-md{
     -fx-pref-width: 140;
 
 }
