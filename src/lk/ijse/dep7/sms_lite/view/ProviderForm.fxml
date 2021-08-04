@@ -28,19 +28,19 @@
                <children>
                   <HBox spacing="20.0">
                      <children>
-                        <Label styleClass="lable-md" text="Provider ID" />
+                        <Label styleClass="label-md" text="Provider ID" />
                         <TextField fx:id="txtID" promptText="eg: PID01" />
                      </children>
                   </HBox>
                   <HBox spacing="20.0">
                      <children>
-                        <Label styleClass="lable-md" text="Provider Name" />
+                        <Label styleClass="label-md" text="Provider Name" />
                         <TextField fx:id="txtName" promptText="eg: Dialog" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                   <HBox spacing="20.0">
                      <children>
-                        <Label styleClass="lable-md" text="Operator code" />
+                        <Label styleClass="label-md" text="Operator code" />
                         <VBox spacing="10.0">
                            <children>
                               <TextField fx:id="txtCode" promptText="eg: 077" />
@@ -66,9 +66,9 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <HBox spacing="20.0" styleClass="lable-md">
+            <HBox spacing="20.0" styleClass="label-md">
                <children>
-                  <Label fx:id="lblSearchStudent" styleClass="lable-md" text="Search Providers" />
+                  <Label fx:id="lblSearchStudent" styleClass="label-md" text="Search Providers" />
                   <TextField fx:id="txtSearch" promptText="Search Providers by ID, Name, and Operator Code" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
