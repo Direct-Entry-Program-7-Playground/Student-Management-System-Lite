@@ -7,6 +7,7 @@
 
 package lk.ijse.dep7.sms_lite.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import lk.ijse.dep7.sms_lite.AppInitializer;
 
 import java.io.IOException;
 
@@ -23,29 +25,56 @@ public class MainFormController {
     @FXML
     private Button btnProviders;
 
+    private static void navigation(NavigationMenu navigationMenu) throws IOException {
+
+        String url = "";
+        String title = "";
+
+        switch (navigationMenu) {
+
+            case STUDENTFORM: {
+                url = "../view/StudentManagementForm.fxml";
+                title = "Student Management System";
+                break;
+            }
+            case PROVIDERFORM: {
+                url = "../view/ProviderForm.fxml";
+                title = "Service Providers";
+                break;
+            }
+            default: {
+                url = "../view/ProviderForm.fxml";
+                title = "Student Management System - Lite";
+                break;
+            }
+        }
+
+        Parent root = FXMLLoader.load(MainFormController.class.getResource(url));
+        Scene scene = new Scene(root);
+
+        Stage stage = AppInitializer.getPrimaryStage();
+        stage.setScene(scene);
+
+        String finalTitle = title;
+        Platform.runLater(() -> {
+            stage.setTitle(finalTitle);
+            stage.sizeToScene();
+            stage.centerOnScreen();
+        });
+    }
+
     @FXML
     private void btnSMS_onAction(ActionEvent event) throws IOException {
-        loadForm("../view/StudentManagementForm.fxml", "Student Management System");
+        navigation(NavigationMenu.STUDENTFORM);
 
     }
 
     @FXML
     private void btnProviders_onAction(ActionEvent event) throws IOException {
-        loadForm("../view/ProviderForm.fxml", "Service Providers");
+        navigation(NavigationMenu.PROVIDERFORM);
     }
 
-
-    private void loadForm(String location, String title) throws IOException {
-        Parent root = FXMLLoader.load(this.getClass().getResource(location));
-        Scene scene = new Scene(root);
-
-        Stage stage = (Stage) btnSMS.getScene().getWindow();
-
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.setTitle(title);
-        stage.setResizable(false);
-        stage.show();
-        stage.centerOnScreen();
+    public enum NavigationMenu {
+        STUDENTFORM, PROVIDERFORM, MAINFORM
     }
 }
