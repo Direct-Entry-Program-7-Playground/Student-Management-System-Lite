@@ -14,13 +14,19 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class AppInitializer extends Application {
+    public static Stage primaryStage = null;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     @Override
     public void start(Stage primaryStage) throws IOException {
+        this.primaryStage = primaryStage;
         Parent root = FXMLLoader.load(this.getClass().getResource("lk/ijse/dep7/sms_lite/view/MainForm.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
