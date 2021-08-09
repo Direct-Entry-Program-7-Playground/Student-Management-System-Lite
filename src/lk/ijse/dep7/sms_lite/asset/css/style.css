@@ -9,18 +9,24 @@
     -fx-font-size: 16;
 }
 
-.text-field, .button, .table-column, .combo-box,.label {
+.text-field, .button, .combo-box, .label {
     -fx-pref-height: 40;
 }
 
 .table-column {
     -fx-alignment: CENTER;
+    -fx-min-height: 40;
+}
+
+.list-cell{
+    -fx-pref-height: 40;
 }
 
 .label {
     -fx-pref-width: 60;
 }
-.field-md{
+
+.field-md {
     -fx-pref-width: 210;
 }
 
