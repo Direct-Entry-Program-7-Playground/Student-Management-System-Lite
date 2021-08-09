@@ -17,9 +17,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
+import lk.ijse.dep7.sms_lite.util.DBConnection;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class StudentManagementFormController {
@@ -27,6 +31,7 @@ public class StudentManagementFormController {
     BooleanProperty hasPhoneNumber = new SimpleBooleanProperty(false);
     Connection connection;
     PreparedStatement FIND_STUDENT_QUERY;
+
     @FXML
     private TextField txtID;
     @FXML
@@ -91,25 +96,13 @@ public class StudentManagementFormController {
 
         });
 
+        // Define prepareStatements
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SMSLite", "root", "7251mMm7251");
-
-            // Define prepareStatements
+            connection = DBConnection.getInstance().getConnection();
             FIND_STUDENT_QUERY = connection.prepareStatement("SELECT * FROM student INNER JOIN contact ON student.id = contact.student_id WHERE student_id = ?;");
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    if (!connection.isClosed()) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }));
-
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to connect with the database").showAndWait();
-            e.printStackTrace();
+            
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
 
 
