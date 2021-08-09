@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import lk.ijse.dep7.sms_lite.model.tm.ProviderTM;
 import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
 import lk.ijse.dep7.sms_lite.util.DBConnection;
 
@@ -129,6 +130,7 @@ public class StudentManagementFormController {
 
     private void init() {
         loadAllStudents();
+        loadAllProviders();
     }
 
     private void loadAllStudents() {
@@ -169,6 +171,45 @@ public class StudentManagementFormController {
 
         return null;
     }
+
+    private void loadAllProviders() {
+        cmbProvider.getItems().clear();
+
+        try {
+            PreparedStatement PSTM_GET_ALL_PROVIDERS_DATA_QUERY = connection.prepareStatement("SELECT * FROM provider;");
+            ResultSet rst = PSTM_GET_ALL_PROVIDERS_DATA_QUERY.executeQuery();
+
+            while (rst.next()) {
+                int id = rst.getInt("id");
+                String name = rst.getString("name");
+                String operatorCode = rst.getString("operatorCode");
+
+                List<String> operatorCodes;
+                if ((operatorCodes = getProviderOperatorCodes(name)) == null) {
+                    operatorCodes = new ArrayList<>();
+                    if (operatorCode != null) {
+                        operatorCodes.add(operatorCode);
+                    }
+                    cmbProvider.getItems().add(new ProviderTM(id, name, operatorCodes));
+                } else {
+                    operatorCodes.add(operatorCode);
+                }
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private List<String> getProviderOperatorCodes(String providerName) {
+        for (Object item : cmbProvider.getItems()) {
+            ProviderTM provider = (ProviderTM) item;
+            if (provider.getName().equals(providerName)) return provider.getOperatorCodes();
+        }
+
+        return null;
+    }
+
 
     private void addStudentsToTableView(ResultSet rst) throws SQLException {
 
