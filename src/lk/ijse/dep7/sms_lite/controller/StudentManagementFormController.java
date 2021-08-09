@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -55,7 +56,7 @@ public class StudentManagementFormController {
     @FXML
     private TableColumn colName;
     @FXML
-    private TableColumn colPhone;
+    private TableColumn<StudentTM, ListView<String>> colPhone;
     @FXML
     private TableColumn<StudentTM, Button> colAction;
     @FXML
@@ -76,7 +77,16 @@ public class StudentManagementFormController {
 
         colID.setCellValueFactory(new PropertyValueFactory<>("studentID"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPhone.setCellValueFactory(new PropertyValueFactory<>("phoneNumbers"));
+        
+        colPhone.setCellValueFactory(param -> {
+            ListView<String> list = new ListView<>();
+            list.prefHeight(list.getItems().size() * 44);
+            StudentTM student = param.getValue();
+            list.setItems(FXCollections.observableArrayList(student.getContacts()));
+
+            return new ReadOnlyObjectWrapper<>(list);
+        });
+
         colAction.setCellValueFactory(param -> {
             ImageView img = new ImageView("/lk/ijse/dep7/sms_lite/asset/image/delete.png");
             img.setFitHeight(20);
@@ -100,7 +110,7 @@ public class StudentManagementFormController {
         try {
             connection = DBConnection.getInstance().getConnection();
             FIND_STUDENT_QUERY = connection.prepareStatement("SELECT * FROM student INNER JOIN contact ON student.id = contact.student_id WHERE student_id = ?;");
-            
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
