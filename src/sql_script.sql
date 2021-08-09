@@ -17,13 +17,15 @@ CREATE TABLE student
     id   INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(450) NOT NULL
 );
+ALTER TABLE student
+    AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS provider;
 CREATE TABLE provider
 (
     id           INT PRIMARY KEY,
-    name         VARCHAR(150) NOT NULL,
-    operatorCode VARCHAR(3)   NOT NULL
+    name         VARCHAR(150) NOT NULL UNIQUE,
+    operatorCode VARCHAR(3)   NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS contact;
@@ -33,7 +35,7 @@ CREATE TABLE contact
     student_id  INT         NOT NULL,
     provider_id INT         NOT NULL,
     CONSTRAINT PRIMARY KEY (contact, student_id),
-    CONSTRAINT fk_contact FOREIGN KEY (student_id) REFERENCES student (id),
+    CONSTRAINT fk_contact FOREIGN KEY (student_id) REFERENCES student (id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_provider FOREIGN KEY (provider_id) REFERENCES provider (id)
 );
 
