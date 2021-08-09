@@ -5,7 +5,7 @@
  *
  */
 
-package lk.ijse.dep7.sms_lite.view;
+package lk.ijse.dep7.sms_lite.util;
 
 import javafx.scene.control.Alert;
 
@@ -41,7 +41,7 @@ public class DBConnection {
 
     }
 
-    public DBConnection getInstance() {
+    public static DBConnection getInstance() {
         return (instance == null) ? instance = new DBConnection() : instance;
     }
 
