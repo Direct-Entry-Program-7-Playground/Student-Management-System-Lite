@@ -67,6 +67,8 @@ public class StudentManagementFormController {
     private Button btnClearPhoneList;
     @FXML
     private Button btnHome;
+    @FXML
+    private ComboBox cmbProvider;
 
     public void initialize() {
         tableColumnAutoSize();

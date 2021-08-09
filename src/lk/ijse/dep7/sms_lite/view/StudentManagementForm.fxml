@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -28,7 +29,7 @@
                   <HBox spacing="20.0">
                      <children>
                         <Label styleClass="label-md" text="Student ID" />
-                        <TextField fx:id="txtID" disable="true" promptText="eg: 1" />
+                        <TextField fx:id="txtID" disable="true" promptText="eg: 1" styleClass="field-md" />
                         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                            <children>
                               <Button fx:id="btnHome" contentDisplay="CENTER" mnemonicParsing="false" onAction="#btnHome_onAction" styleClass="btn-controller" textAlignment="CENTER" />
@@ -47,7 +48,12 @@
                         <Label styleClass="label-md" text="Student Phone" />
                         <VBox spacing="10.0">
                            <children>
-                              <TextField fx:id="txtPhone" promptText="eg: 077-123 4567" />
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <TextField fx:id="txtPhone" promptText="eg: 077-123 4567" styleClass="field-md" />
+                                    <ComboBox fx:id="cmbProvider" prefWidth="150.0" promptText="Select Provider" styleClass="field-md" />
+                                 </children>
+                              </HBox>
                               <ListView fx:id="lstvwPhoneList" prefHeight="150.0" prefWidth="200.0" />
                            </children>
                         </VBox>
@@ -80,7 +86,8 @@
               <columns>
                 <TableColumn fx:id="colID" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="ID" />
                 <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="363.0" prefWidth="363.0" text="Name" />
-                  <TableColumn fx:id="colPhone" maxWidth="600.0" minWidth="300.0" prefWidth="300.0" text="Phone " />
+                  <TableColumn fx:id="colPhone" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Phone " />
+                  <TableColumn fx:id="colPhone1" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Provider" />
                   <TableColumn fx:id="colAction" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Action" />
               </columns>
             </TableView>
