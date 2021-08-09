@@ -77,7 +77,7 @@ public class StudentManagementFormController {
 
         colID.setCellValueFactory(new PropertyValueFactory<>("studentID"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        
+
         colPhone.setCellValueFactory(param -> {
             ListView<String> list = new ListView<>();
             list.prefHeight(list.getItems().size() * 44);
@@ -98,8 +98,8 @@ public class StudentManagementFormController {
 
             btnRowDelete.setOnAction(
                     (event) -> {
-                        deleteStudent(event, param.getValue());
-                        tblStudent.getItems().remove(param.getValue());
+                        StudentTM student = param.getValue();
+                        deleteStudent(event, student);
                     }
             );
             return new ReadOnlyObjectWrapper<>(btnRowDelete);
