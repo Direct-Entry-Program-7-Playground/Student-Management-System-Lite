@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS provider;
 CREATE TABLE provider
 (
     id           INT PRIMARY KEY,
-    name         VARCHAR(150) NOT NULL UNIQUE,
+    name         VARCHAR(150) NOT NULL ,
     operatorCode VARCHAR(3)   NOT NULL UNIQUE
 );
 
@@ -51,6 +51,8 @@ INSERT INTO student (name)
 VALUES ('Nuwan Kulasekara');
 INSERT INTO student (name)
 VALUES ('Rangana Herath');
+INSERT INTO student (name)
+VALUES ('Mahela Jayawardana');
 
 
 INSERT INTO provider
