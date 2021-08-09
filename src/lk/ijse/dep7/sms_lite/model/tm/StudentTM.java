@@ -12,11 +12,11 @@ import java.util.List;
 
 public class StudentTM {
 
-    private String studentID;
+    private int studentID;
     private String name;
     private List<String> contacts = new ArrayList<>();
 
-    public StudentTM(String studentID, String name, List<String> contacts) {
+    public StudentTM(int studentID, String name, List<String> contacts) {
         this.setStudentID(studentID);
         this.setName(name);
         this.setContacts(contacts);
@@ -26,11 +26,11 @@ public class StudentTM {
     }
 
 
-    public String getStudentID() {
+    public int getStudentID() {
         return studentID;
     }
 
-    public void setStudentID(String studentID) {
+    public void setStudentID(int studentID) {
         this.studentID = studentID;
     }
 
