@@ -129,6 +129,17 @@ public class StudentManagementFormController {
 
     }
 
+    private void loadAllStudents() {
+        tblStudent.getItems().clear();
+
+        try {
+            connection.prepareStatement("SELECT * FROM SMSLite.student s LEFT JOIN contact c on s.id = c.student_id LEFT JOIN provider p on p.id = c.provider_id");
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     private void addStudentsToTableView(ResultSet rst) throws SQLException {
 
     }
