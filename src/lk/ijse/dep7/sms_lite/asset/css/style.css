@@ -9,7 +9,7 @@
     -fx-font-size: 16;
 }
 
-.text-field, .button, .table-column {
+.text-field, .button, .table-column, .combo-box,.label {
     -fx-pref-height: 40;
 }
 
@@ -19,7 +19,9 @@
 
 .label {
     -fx-pref-width: 60;
-    -fx-pref-height: 40;
+}
+.field-md{
+    -fx-pref-width: 210;
 }
 
 #colAction {
