@@ -7,7 +7,9 @@
 
 package lk.ijse.dep7.sms_lite.model.lm;
 
-public class ContactLM {
+import java.io.Serializable;
+
+public class ContactLM implements Serializable {
 
     private String contact;
     private int providerID;
