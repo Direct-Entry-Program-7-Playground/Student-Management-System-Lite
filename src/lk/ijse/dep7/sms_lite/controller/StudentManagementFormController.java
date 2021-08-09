@@ -72,8 +72,8 @@ public class StudentManagementFormController {
         tableColumnAutoSize();
 
         // Allow multiple row selection
-        tblStudent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        lstvwPhoneList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        /*tblStudent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        lstvwPhoneList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);*/
 
         colID.setCellValueFactory(new PropertyValueFactory<>("studentID"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
