@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProviderTM {
-    private String providerId;
+    private int providerId;
     private String name;
     private List<String> operatorCodes = new ArrayList<>();
 
-    public ProviderTM(String providerId, String name, List<String> operatorCodes) {
+    public ProviderTM(int providerId, String name, List<String> operatorCodes) {
         this.setProviderId(providerId);
         this.setName(name);
         this.setOperatorCodes(operatorCodes);
@@ -24,11 +24,11 @@ public class ProviderTM {
     public ProviderTM() {
     }
 
-    public String getProviderId() {
+    public int getProviderId() {
         return providerId;
     }
 
-    public void setProviderId(String providerId) {
+    public void setProviderId(int providerId) {
         this.providerId = providerId;
     }
 
