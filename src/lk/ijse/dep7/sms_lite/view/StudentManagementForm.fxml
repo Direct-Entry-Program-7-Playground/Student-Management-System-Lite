@@ -86,9 +86,8 @@
               <columns>
                 <TableColumn fx:id="colID" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="ID" />
                 <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="363.0" prefWidth="363.0" text="Name" />
-                  <TableColumn fx:id="colPhone" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Phone " />
-                  <TableColumn fx:id="colPhone1" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Provider" />
-                  <TableColumn fx:id="colAction" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Action" />
+                  <TableColumn fx:id="colPhone" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" text="Phone " />
+                  <TableColumn fx:id="colAction" maxWidth="80.0" minWidth="80.0" text="Action" />
               </columns>
             </TableView>
          </children>
