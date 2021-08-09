@@ -48,4 +48,9 @@ public class ProviderTM implements Serializable {
     public void setOperatorCodes(List<String> operatorCodes) {
         this.operatorCodes = operatorCodes;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
