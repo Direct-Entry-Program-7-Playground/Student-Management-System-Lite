@@ -25,7 +25,7 @@ public class MainFormController {
     @FXML
     private Button btnProviders;
 
-    private static void navigation(NavigationMenu navigationMenu) throws IOException {
+    public static void navigation(NavigationMenu navigationMenu) throws IOException {
 
         String url = "";
         String title = "";
@@ -42,11 +42,12 @@ public class MainFormController {
                 title = "Service Providers";
                 break;
             }
-            default: {
-                url = "../view/ProviderForm.fxml";
+            case MAINFORM: {
+                url = "../view/MainForm.fxml";
                 title = "Student Management System - Lite";
                 break;
             }
+
         }
 
         Parent root = FXMLLoader.load(MainFormController.class.getResource(url));
