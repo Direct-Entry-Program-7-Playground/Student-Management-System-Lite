@@ -25,6 +25,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StudentManagementFormController {
@@ -82,10 +84,10 @@ public class StudentManagementFormController {
 
         colPhone.setCellValueFactory(param -> {
             ListView<String> list = new ListView<>();
-            list.prefHeight(list.getItems().size() * 44);
             StudentTM student = param.getValue();
             list.setItems(FXCollections.observableArrayList(student.getContacts()));
 
+            list.setPrefHeight(student.getContacts().size() * 44);
             return new ReadOnlyObjectWrapper<>(list);
         });
 
@@ -117,10 +119,8 @@ public class StudentManagementFormController {
             throwables.printStackTrace();
         }
 
-
-        init();
-
         Platform.runLater(() -> {
+            init();
 
         });
 
@@ -128,18 +128,46 @@ public class StudentManagementFormController {
     }
 
     private void init() {
-
+        loadAllStudents();
     }
 
     private void loadAllStudents() {
         tblStudent.getItems().clear();
 
         try {
-            connection.prepareStatement("SELECT * FROM SMSLite.student s LEFT JOIN contact c on s.id = c.student_id LEFT JOIN provider p on p.id = c.provider_id");
+            PreparedStatement PSTM_GET_ALL_STUDENTS_DATA_QUERY = connection.prepareStatement("SELECT s.id AS student_id, s.name AS student_name,c.contact AS contact_no, p.name AS provider_name FROM SMSLite.student s LEFT JOIN contact c ON s.id = c.student_id LEFT JOIN provider p ON p.id = c.provider_id");
+            ResultSet rst = PSTM_GET_ALL_STUDENTS_DATA_QUERY.executeQuery();
 
+
+            while (rst.next()) {
+                int studentId = rst.getInt("student_id");
+                String studentName = rst.getString("student_name");
+                String contactNo = rst.getString("contact_no");
+
+                List<String> contacts;
+                if ((contacts = getStudentContacts(studentId)) == null) {
+                    contacts = new ArrayList<>();
+
+                    if (contactNo != null) {
+                        contacts.add(contactNo);
+                    }
+
+                    tblStudent.getItems().add(new StudentTM(studentId, studentName, contacts));
+                } else {
+                    contacts.add(contactNo);
+                }
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+
+    private List<String> getStudentContacts(int studentID) {
+        for (StudentTM student : tblStudent.getItems()) {
+            if (student.getStudentID() == studentID) return student.getContacts();
+        }
+
+        return null;
     }
 
     private void addStudentsToTableView(ResultSet rst) throws SQLException {
