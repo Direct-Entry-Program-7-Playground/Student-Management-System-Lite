@@ -7,10 +7,11 @@
 
 package lk.ijse.dep7.sms_lite.model.tm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProviderTM {
+public class ProviderTM implements Serializable {
     private int providerId;
     private String name;
     private List<String> operatorCodes = new ArrayList<>();
