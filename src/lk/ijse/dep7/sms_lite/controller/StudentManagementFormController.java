@@ -215,7 +215,58 @@ public class StudentManagementFormController {
 
     }
 
-    private void deleteStudent(ActionEvent actionEvent, StudentTM studentTM) {
+    private void deleteStudent(ActionEvent actionEvent, StudentTM student) {
+
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement PSTM_FIND_CONTACT_FROM_STUDENT_ID_QUERY = connection.prepareStatement("SELECT * FROM contact WHERE student_id =?;");
+            PSTM_FIND_CONTACT_FROM_STUDENT_ID_QUERY.setInt(1, student.getStudentID());
+
+            PreparedStatement PSTM_DELETE_CONTACTS_OF_STUDENT_ID = connection.prepareStatement("DELETE FROM contact WHERE student_id = ?;");
+            PSTM_DELETE_CONTACTS_OF_STUDENT_ID.setInt(1, student.getStudentID());
+
+            if (PSTM_FIND_CONTACT_FROM_STUDENT_ID_QUERY.executeQuery().next()) {
+
+                int deletedRows = PSTM_DELETE_CONTACTS_OF_STUDENT_ID.executeUpdate();
+                if (deletedRows == 0) {
+                    throw new RuntimeException("Failed to delete contacts");
+                }
+            }
+
+            PreparedStatement PSTM_DELETE_STUDENT = connection.prepareStatement("DELETE FROM student WHERE id =?;");
+            PSTM_DELETE_STUDENT.setInt(1, student.getStudentID());
+            if (PSTM_DELETE_STUDENT.executeUpdate() != 1) {
+                throw new RuntimeException("Failed to delete the student");
+            }
+
+            connection.commit();
+            StringBuilder sb = new StringBuilder();
+            sb.append("#");
+            sb.append(student.getStudentID());
+            sb.append(" - ");
+            sb.append(student.getName());
+            sb.append(" has been deleted successfully");
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, sb.toString());
+            alert.setWidth(sb.length());
+            alert.show();
+            tblStudent.getItems().remove(student);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            throw new RuntimeException("Failed to delete the student");
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
 
     }
 
