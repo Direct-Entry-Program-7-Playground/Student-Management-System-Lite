@@ -11,15 +11,23 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import lk.ijse.dep7.sms_lite.model.tm.ProviderTM;
 import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
+import lk.ijse.dep7.sms_lite.util.DBConnection;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class StudentManagementFormController {
@@ -27,6 +35,7 @@ public class StudentManagementFormController {
     BooleanProperty hasPhoneNumber = new SimpleBooleanProperty(false);
     Connection connection;
     PreparedStatement FIND_STUDENT_QUERY;
+
     @FXML
     private TextField txtID;
     @FXML
@@ -50,7 +59,7 @@ public class StudentManagementFormController {
     @FXML
     private TableColumn colName;
     @FXML
-    private TableColumn colPhone;
+    private TableColumn<StudentTM, ListView<String>> colPhone;
     @FXML
     private TableColumn<StudentTM, Button> colAction;
     @FXML
@@ -61,17 +70,28 @@ public class StudentManagementFormController {
     private Button btnClearPhoneList;
     @FXML
     private Button btnHome;
+    @FXML
+    private ComboBox cmbProvider;
 
     public void initialize() {
         tableColumnAutoSize();
 
         // Allow multiple row selection
-        tblStudent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        lstvwPhoneList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        /*tblStudent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        lstvwPhoneList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);*/
 
         colID.setCellValueFactory(new PropertyValueFactory<>("studentID"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPhone.setCellValueFactory(new PropertyValueFactory<>("phoneNumbers"));
+
+        colPhone.setCellValueFactory(param -> {
+            ListView<String> list = new ListView<>();
+            StudentTM student = param.getValue();
+            list.setItems(FXCollections.observableArrayList(student.getContacts()));
+
+            list.setPrefHeight(student.getContacts().size() * 44);
+            return new ReadOnlyObjectWrapper<>(list);
+        });
+
         colAction.setCellValueFactory(param -> {
             ImageView img = new ImageView("/lk/ijse/dep7/sms_lite/asset/image/delete.png");
             img.setFitHeight(20);
@@ -83,39 +103,25 @@ public class StudentManagementFormController {
 
             btnRowDelete.setOnAction(
                     (event) -> {
-                        deleteStudent(event, param.getValue());
-                        tblStudent.getItems().remove(param.getValue());
+                        StudentTM student = param.getValue();
+                        deleteStudent(event, student);
                     }
             );
             return new ReadOnlyObjectWrapper<>(btnRowDelete);
 
         });
 
+        // Define prepareStatements
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/SMSLite", "root", "7251mMm7251");
-
-            // Define prepareStatements
+            connection = DBConnection.getInstance().getConnection();
             FIND_STUDENT_QUERY = connection.prepareStatement("SELECT * FROM student INNER JOIN contact ON student.id = contact.student_id WHERE student_id = ?;");
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    if (!connection.isClosed()) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }));
-
-        } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Failed to connect with the database").showAndWait();
-            e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
 
-
-        init();
-
         Platform.runLater(() -> {
+            init();
 
         });
 
@@ -123,8 +129,87 @@ public class StudentManagementFormController {
     }
 
     private void init() {
-
+        loadAllStudents();
+        loadAllProviders();
     }
+
+    private void loadAllStudents() {
+        tblStudent.getItems().clear();
+
+        try {
+            PreparedStatement PSTM_GET_ALL_STUDENTS_DATA_QUERY = connection.prepareStatement("SELECT s.id AS student_id, s.name AS student_name,c.contact AS contact_no, p.name AS provider_name FROM SMSLite.student s LEFT JOIN contact c ON s.id = c.student_id LEFT JOIN provider p ON p.id = c.provider_id");
+            ResultSet rst = PSTM_GET_ALL_STUDENTS_DATA_QUERY.executeQuery();
+
+
+            while (rst.next()) {
+                int studentId = rst.getInt("student_id");
+                String studentName = rst.getString("student_name");
+                String contactNo = rst.getString("contact_no");
+
+                List<String> contacts;
+                if ((contacts = getStudentContacts(studentId)) == null) {
+                    contacts = new ArrayList<>();
+
+                    if (contactNo != null) {
+                        contacts.add(contactNo);
+                    }
+
+                    tblStudent.getItems().add(new StudentTM(studentId, studentName, contacts));
+                } else {
+                    contacts.add(contactNo);
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private List<String> getStudentContacts(int studentID) {
+        for (StudentTM student : tblStudent.getItems()) {
+            if (student.getStudentID() == studentID) return student.getContacts();
+        }
+
+        return null;
+    }
+
+    private void loadAllProviders() {
+        cmbProvider.getItems().clear();
+
+        try {
+            PreparedStatement PSTM_GET_ALL_PROVIDERS_DATA_QUERY = connection.prepareStatement("SELECT * FROM provider;");
+            ResultSet rst = PSTM_GET_ALL_PROVIDERS_DATA_QUERY.executeQuery();
+
+            while (rst.next()) {
+                int id = rst.getInt("id");
+                String name = rst.getString("name");
+                String operatorCode = rst.getString("operatorCode");
+
+                List<String> operatorCodes;
+                if ((operatorCodes = getProviderOperatorCodes(name)) == null) {
+                    operatorCodes = new ArrayList<>();
+                    if (operatorCode != null) {
+                        operatorCodes.add(operatorCode);
+                    }
+                    cmbProvider.getItems().add(new ProviderTM(id, name, operatorCodes));
+                } else {
+                    operatorCodes.add(operatorCode);
+                }
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private List<String> getProviderOperatorCodes(String providerName) {
+        for (Object item : cmbProvider.getItems()) {
+            ProviderTM provider = (ProviderTM) item;
+            if (provider.getName().equals(providerName)) return provider.getOperatorCodes();
+        }
+
+        return null;
+    }
+
 
     private void addStudentsToTableView(ResultSet rst) throws SQLException {
 
