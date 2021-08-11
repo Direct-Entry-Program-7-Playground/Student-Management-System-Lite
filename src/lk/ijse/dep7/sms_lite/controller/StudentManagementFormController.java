@@ -305,6 +305,8 @@ public class StudentManagementFormController {
 
     @FXML
     private void btnDelete_onAction(ActionEvent actionEvent) {
+        StudentTM selectedStudent = tblStudent.getSelectionModel().getSelectedItem();
+        deleteStudent(actionEvent, selectedStudent);
 
     }
 
