@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Region;
 import lk.ijse.dep7.sms_lite.model.tm.ProviderTM;
 import lk.ijse.dep7.sms_lite.model.tm.StudentTM;
 import lk.ijse.dep7.sms_lite.util.DBConnection;
@@ -248,7 +249,7 @@ public class StudentManagementFormController {
             sb.append(" has been deleted successfully");
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION, sb.toString());
-            alert.setWidth(sb.length());
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.show();
             tblStudent.getItems().remove(student);
 
